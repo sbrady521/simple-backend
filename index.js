@@ -8,31 +8,43 @@ require('dotenv').config()
 app.use(express.json())
 
 app.get('/get-retool-url', async (req, res) => {
-  const url = 'https://app.pathweaver.ai/api/embed-url/external-user'
-  const data = {
-    // Your POST data here as per https://docs.retool.com/apps/external/quickstarts/embed
-    "landingPageUuid": "aa8ca8d4-8cdd-11ee-94a9-37f4d911b569",
-    "groupIds": "2276747",
-    "externalIdentifier": "brent@pathweaver.ai",
-    "userInfo": {
-      "email": "brent@pathweaver.ai"
-    }
+  const userEmail = req.query.email; // Get email from query parameter
+
+  if (!userEmail) {
+    return res.status(400).json({ error: 'Email is required' });
   }
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.RETOOL_ACCESS_TOKEN}`
-    },
-    body: JSON.stringify(data)
-  })
+  const url = 'https://app.pathweaver.ai/api/embed-url/external-user'
+  const data = {
+    landingPageUuid: "aa8ca8d4-8cdd-11ee-94a9-37f4d911b569",
+    groupIds: "2276747",
+    externalIdentifier: "brent@pathweaver.ai",
+    userInfo: { "email": userEmail }
+  }
 
-  const result = await response.join()
-  console.log(result)
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.RETOOL_ACCESS_TOKEN}`
+      },
+      body: JSON.stringify(data)
+    });
 
-
-  res.json({ message: "Replace this with the actual response from Retool" })
+    if (!response.ok) {
+      // Forward the error status and the response body
+      res.status(response.status);
+      response.body.pipe(res);
+    } else {
+      // Stream the response body directly to the client
+      response.body.pipe(res);
+    }
+  } catch (error) {
+    // Handle network or other operational errors
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 })
 
 app.listen(port, () => {
