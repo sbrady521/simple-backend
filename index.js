@@ -1,3 +1,5 @@
+//Access the URL at http://localhost:3000/get-retool-url?email=brent@pathweaver.ai
+//Response will come back looking like this: {"embedUrl":"https://app.pathweaver.ai/embed-redirect?nonce=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&destination=%2Fembedded%2Fauthed%2Fxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"}
 const express = require('express')
 const fetch = require('node-fetch')
 
@@ -17,7 +19,7 @@ app.get('/get-retool-url', async (req, res) => {
   const url = 'https://app.pathweaver.ai/api/embed-url/external-user'
   const data = {
     landingPageUuid: "aa8ca8d4-8cdd-11ee-94a9-37f4d911b569",
-    groupIds: "2276747",
+    groupIds: [2276747],
     externalIdentifier: "brent@pathweaver.ai",
     userInfo: { "email": userEmail }
   }
