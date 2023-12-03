@@ -9,6 +9,10 @@ require('dotenv').config()
 
 app.use(express.json())
 
+app.get("/", (req, res) => {
+  res.send("It be working");
+})
+
 app.get('/get-retool-url', async (req, res) => {
   const userEmail = req.query.email; // Get email from query parameter
 
